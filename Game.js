@@ -27,7 +27,8 @@ button.src = 'button.png';
 countries = {
     "Egypt": {
         "x" : 0.54,
-        "y" : 0.55
+        "y" : 0.55,
+        "neighbors" : ["East-Africa", "West-Africa", "Southern Europe", "Middle East"]
     },
     "West-Africa": {
         "x" : 0.46,
@@ -119,8 +120,88 @@ countries = {
     "Quebec": {
         "x" : 0.29,
         "y" : 0.25
-    }
+    },
 
+    "Iceland": {
+        "x" : 0.43,
+        "y" : 0.21,
+        "neighbors" : ["UK", "Greenland", "Scandinavia"]
+    },
+    "UK": {
+        "x" : 0.41,
+        "y" : 0.30,
+        "neighbors" : ["Iceland", "Southern Europe", "Scandinavia", "Northern Europe"]
+    },
+    "Western Europe": {
+        "x" : 0.43,
+        "y" : 0.43,
+        "neighbors" : ["West-Africa", "Northern Europe", "UK", "Southern Europe"]
+    },
+    "Northern Europe": {
+        "x" : 0.50,
+        "y" : 0.31
+    },
+    "Southern Europe": {
+        "x" : 0.51,
+        "y" : 0.42
+    },
+    "Eastern Europe": {
+        "x" : 0.58,
+        "y" : 0.31
+    },
+    "Scandinavia": {
+        "x" : 0.50,
+        "y" : 0.21
+    },
+
+    "Middle East": {
+        "x" : 0.63,
+        "y" : 0.52
+    },
+    "Afhanistan": {
+        "x" : 0.68,
+        "y" : 0.38
+    },
+    "India": {
+        "x" : 0.72,
+        "y" : 0.48
+    },
+    "China": {
+        "x" : 0.82,
+        "y" : 0.45
+    },
+    "Southeast Asia": {
+        "x" : 0.80,
+        "y" : 0.55
+    },
+    "Mongolia": {
+        "x" : 0.82,
+        "y" : 0.35
+    },
+    "Japan": {
+        "x" : 0.92,
+        "y" : 0.35
+    },
+    "Kamchatka": {
+        "x" : 0.88,
+        "y" : 0.15
+    },
+    "Irkutsk": {
+        "x" : 0.80,
+        "y" : 0.26
+    },
+    "Yakutsk": {
+        "x" : 0.81,
+        "y" : 0.14
+    },
+    "Siberia": {
+        "x" : 0.73,
+        "y" : 0.16
+    },
+    "Ural": {
+        "x" : 0.68,
+        "y" : 0.22
+    }
 };
 
 var hRatio = 1;
