@@ -25,14 +25,102 @@ var button = new Image();
 button.src = 'button.png';
 
 countries = {
-    "Kongo": {
+    "Egypt": {
         "x" : 0.54,
         "y" : 0.55
     },
     "West-Africa": {
         "x" : 0.46,
         "y" : 0.58
+    },
+    "East-Africa": {
+        "x" : 0.62,
+        "y" : 0.69
+    },
+    "South-Africa": {
+        "x" : 0.54,
+        "y" : 0.83
+    },
+    "Madagascar": {
+        "x" : 0.64,
+        "y" : 0.84
+    },
+    "Kongo": {
+        "x" : 0.54,
+        "y" : 0.71
+    },
+
+    "West-Australia": {
+        "x" : 0.95,
+        "y" : 0.84
+    },
+    "East-Australia": {
+        "x" : 0.85,
+        "y" : 0.84
+    },
+    "New-Guinea": {
+        "x" : 0.90,
+        "y" : 0.67
+    },
+    "Indonesia": {
+        "x" : 0.82,
+        "y" : 0.69
+    },
+
+    "Brazil": {
+        "x" : 0.32,
+        "y" : 0.64
+    },
+    "Venezuela": {
+        "x" : 0.23,
+        "y" : 0.55
+    },
+    "Argentinia": {
+        "x" : 0.26,
+        "y" : 0.79
+    },
+    "Peru": {
+        "x" : 0.23,
+        "y" : 0.66
+    },
+
+    "Middle-America": {
+        "x" : 0.17,
+        "y" : 0.46
+    },
+    "Western-USA": {
+        "x" : 0.16,
+        "y" : 0.34
+    },
+    "Eastern-USA": {
+        "x" : 0.24,
+        "y" : 0.37
+    },
+    "Alberta": {
+        "x" : 0.16,
+        "y" : 0.24
+    },
+    "Alaska": {
+        "x" : 0.07,
+        "y" : 0.16
+    },
+    "North West Territories": {
+        "x" : 0.18,
+        "y" : 0.13
+    },
+    "Greenland": {
+        "x" : 0.35,
+        "y" : 0.13
+    },
+    "Ontario": {
+        "x" : 0.22,
+        "y" : 0.24
+    },
+    "Quebec": {
+        "x" : 0.29,
+        "y" : 0.25
     }
+
 };
 
 var hRatio = 1;
@@ -71,17 +159,31 @@ function getMousePos(canvas, event) {
         y: event.clientY - rect.top
     };
 }
+
 function isInside(pos, rect){
     return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.heigth && pos.y > rect.y
 }
 
+function distance(pos, target) {
+    var dx = pos.x - target.x;
+    var dy = pos.y - target.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
 canvas.addEventListener('click', function(evt) {
     var mousePos = getMousePos(canvas, evt);
-    debugger;
-    if (isInside(mousePos,rect)) {
-        alert('clicked inside rect');
-    } else{
-        alert('clicked outside rect');
+
+    for (var country_name in countries) {
+        if (countries.hasOwnProperty(country_name)) {
+            var country = countries[country_name];
+            var country_pos = {
+                x : country.x * totalWidth + baseOffset_x,
+                y : country.y * totalHeight + baseOffset_y
+            };
+            if (distance(mousePos, country_pos) < 40) {
+                console.log(country_name);
+            }
+        }
     }
 }, false);
 
@@ -100,12 +202,11 @@ function step() {
     for (var country_name in countries) {
         if (countries.hasOwnProperty(country_name)) {
             var country = countries[country_name];
-            console.log(country)
             drawImageScaled(button, context, country.x, country.y, 0.1);
         }
     }
 
-    setTimeout(step, 500);
+    setTimeout(step, 200);
 }
 step();
 //window.requestAnimationFrame(step);
