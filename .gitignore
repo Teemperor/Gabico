@@ -20,3 +20,6 @@ wss_examples
 crypto_test
 io_test
 parse_test
+build
+.idea
+cmake-build-*

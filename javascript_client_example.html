@@ -4,19 +4,45 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>WebSocket Test</title>
 </head>
-<body>
+<body><canvas id='cv'></canvas>
+
 <script>
 var ws;
 window.onload=function(){
-  ws=new WebSocket("ws://localhost:8080/echo");
+  ws=new WebSocket("ws://localhost:8081/echo_all");
   ws.onmessage=function(evt){console.log(evt.data);};
   ws.onopen=function(evt){
     ws.send("Hello");
+    ws.send("Hello1");
+    ws.send("Hello2");
   }
 }
 window.onclose=function(){
   ws.close();
 }
+
+var canvas=document.getElementById('cv');
+var ctx= canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+var img = new Image();
+img.onload = drawImageScaled.bind(null, img, ctx);
+
+function drawImageScaled(img, ctx) {
+    var canvas = ctx.canvas ;
+    var hRatio = canvas.width  / img.width    ;
+    var vRatio =  canvas.height / img.height  ;
+    var ratio  = Math.min ( hRatio, vRatio );
+    var centerShift_x = ( canvas.width - img.width*ratio ) / 2;
+    var centerShift_y = ( canvas.height - img.height*ratio ) / 2;
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.drawImage(img, 0,0, img.width, img.height,
+        centerShift_x,centerShift_y,img.width*ratio, img.height*ratio);
+}
+img.src = 'Risk_board.svg';
+
 </script>
 </body>
 </html>

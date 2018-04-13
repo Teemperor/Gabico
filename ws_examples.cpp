@@ -9,7 +9,7 @@ using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 int main() {
   // WebSocket (WS)-server at port 8080 using 1 thread
   WsServer server;
-  server.config.port = 8080;
+  server.config.port = 8081;
 
   // Example 1: echo WebSocket endpoint
   // Added debug messages for example use of the callbacks
@@ -69,6 +69,7 @@ int main() {
       if(!ec)
         connection->send(send_stream); // Sent after the first send operation is finished
     });
+    std::this_thread::sleep_for(std::chrono::seconds(6));
     connection->send(send_stream); // Most likely queued. Sent after the first send operation is finished.
   };
 
