@@ -79,6 +79,7 @@ int main() {
   //   var ws=new WebSocket("ws://localhost:8080/echo_all");
   //   ws.onmessage=function(evt){console.log(evt.data);};
   //   ws.send("test");
+  std::cerr << "Setup echo_all" << std::endl;
   auto &echo_all = server.endpoint["^/echo_all/?$"];
   echo_all.on_message = [&server](shared_ptr<WsServer::Connection> /*connection*/, shared_ptr<WsServer::Message> message) {
     auto send_stream = make_shared<WsServer::SendStream>();

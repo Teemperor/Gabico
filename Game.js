@@ -108,9 +108,11 @@ canvas.addEventListener('click', function(evt) {
             if (distance(mousePos, country_pos) < 40) {
                 console.log(country_name);
                 selectedCountries = country.neighbors;
+                break;
             }
         }
     }
+    step();
 }, false);
 
 function step() {
