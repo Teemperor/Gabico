@@ -28,12 +28,14 @@ int main() {
   Game TheGame(Data.substr(PrefixLen));
 
   auto &echo_all = server.endpoint["^/echo_all/?$"];
-  echo_all.on_message = [&server, &TheGame](shared_ptr<WsServer::Connection> /*connection*/, shared_ptr<WsServer::Message> message) {
+  echo_all.on_message = [&server, &TheGame](shared_ptr<WsServer::Connection> connection, shared_ptr<WsServer::Message> message) {
     std::string Msg = message->string();
 
     istringstream iss(Msg);
 
     std::vector<std::string> Parts;
+    auto send_stream = make_shared<WsServer::SendStream>();
+
     do
     {
       string P;
@@ -42,19 +44,15 @@ int main() {
     } while (iss);
 
     if (Parts.front() == "ATTACK")
-      TheGame.attackCountry(Parts.at(1), Parts.at(2));
+      *send_stream << TheGame.attackCountry(Parts.at(1), Parts.at(2)).dump();
     else if (Parts.front() == "PING") {
-
+      *send_stream << TheGame.createStatus().dump();
     }
-
-
-    auto send_stream = make_shared<WsServer::SendStream>();
-    *send_stream << message->string();
-
+    connection->send(send_stream);
     // echo_all.get_connections() can also be used to solely receive connections on this endpoint
-    for(auto &a_connection : server.get_connections()) {
-      a_connection->send(send_stream);
-    }
+    //for(auto &a_connection : server.get_connections()) {
+    //  a_connection->send(send_stream);
+    //}
   };
 
   std::cout << "Starting server" << std::endl;

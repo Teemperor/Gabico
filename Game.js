@@ -1,11 +1,12 @@
 var ws;
 window.onload=function(){
     ws=new WebSocket("ws://localhost:8081/echo_all");
-    ws.onmessage=function(evt){console.log(evt.data);};
+    ws.onmessage=function(evt) {
+        var answer = JSON.parse(evt.data);
+        console.log(answer);
+    };
     ws.onopen=function(evt){
-        ws.send("Hello");
-        ws.send("Hello1");
-        ws.send("Hello2");
+        ws.send("PING");
     }
 };
 window.onclose=function(){
@@ -38,6 +39,7 @@ crosshair.src = 'crosshair.png';
 for (var country_name in countries) {
     if (countries.hasOwnProperty(country_name)) {
         var country = countries[country_name];
+        country["owner"] = -1;
         for (var i = 0; i < country.neighbors.length; i++) {
             var neighbor = country.neighbors[i];
             if (!(neighbor in countries)) {
@@ -103,6 +105,12 @@ function distance(pos, target) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
+function isEnemyCountry(country_name) {
+    let country = countries[country_name];
+    console.log(country);
+    return country.owner !== player;
+}
+
 canvas.addEventListener('click', function(evt) {
     let mousePos = getMousePos(canvas, evt);
 
@@ -114,8 +122,14 @@ canvas.addEventListener('click', function(evt) {
                 y : country.y * totalHeight + baseOffset_y
             };
             if (distance(mousePos, country_pos) < 40) {
-                console.log(country_name);
-                selectedCountries = country.neighbors;
+                selectedCountries = [];
+                for (var i = 0; i < country.neighbors.length; ++i) {
+                    var neighbor = country.neighbors[i];
+                    if (isEnemyCountry(neighbor))
+                      selectedCountries.push(neighbor);
+                }
+                // Outdated, select all countries:
+                // selectedCountries = country.neighbors;
                 break;
             }
         }

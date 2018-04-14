@@ -18,4 +18,29 @@ Game::Game(std::string Data) {
       CountriesByName[Name]->addNeighbor(C);
     }
   }
+
+  Players.resize(4);
+  for (std::size_t i = 0; i < Players.size(); ++i) {
+    Players[i] = new Player(i);
+  }
+
+  auto CountriesToAssign = Countries;
+
+  std::random_device rd;
+  std::mt19937 g(rd());
+
+  std::shuffle(CountriesToAssign.begin(), CountriesToAssign.end(), g);
+
+  auto PartSize = CountriesToAssign.size() / Players.size();
+
+  std::size_t Index = 0;
+  std::size_t PlayerIndex = 0;
+  for (auto &i : CountriesToAssign) {
+    if (Index > PartSize) {
+      Index = 0;
+      ++PlayerIndex;
+    }
+    ++Index;
+    i->setOwner(Players.at(PlayerIndex));
+  }
 }
