@@ -51,7 +51,7 @@ target_include_directories(simple-websocket-server INTERFACE ${OPENSSL_INCLUDE_D
 
 # If Simple-WebSocket-Server is not a sub-project:
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
-    add_executable(ws_examples ws_examples.cpp)
+    add_executable(ws_examples ws_examples.cpp Game.cpp Game.h)
     target_link_libraries(ws_examples simple-websocket-server)
     find_package(Boost 1.54.0 COMPONENTS system thread filesystem REQUIRED)
     target_link_libraries(ws_examples ${Boost_LIBRARIES})
