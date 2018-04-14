@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include "json.hpp"
 
 class Player {
 public:
@@ -15,7 +16,8 @@ class Country {
   Player *Owner = nullptr;
   int Units = 1;
 public:
-
+  Country() {
+  }
 };
 
 class Game {
@@ -23,6 +25,9 @@ class Game {
   std::unordered_map<std::string, Country *> CountriesByName;
   std::vector<Player> Players;
 public:
+  Game(std::string Data) {
+    auto j3 = nlohmann::json::parse(Data);;
+  }
 
 };
 

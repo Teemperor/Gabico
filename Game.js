@@ -7,24 +7,31 @@ window.onload=function(){
         ws.send("Hello1");
         ws.send("Hello2");
     }
-}
+};
 window.onclose=function(){
     ws.close();
-}
+};
 
-var canvas=document.getElementById('cv');
-var context= canvas.getContext('2d');
+
+let url_string = window.location.href;
+let url = new URL(url_string);
+let player = url.searchParams.get("player");
+console.log(player);
+
+
+let canvas = document.getElementById('cv');
+let context = canvas.getContext('2d');
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-var background = new Image();
+let background = new Image();
 background.src = 'Risk_board.svg';
 
-var button = new Image();
+let button = new Image();
 button.src = 'button.png';
 
-var crosshair = new Image();
+let crosshair = new Image();
 crosshair.src = 'crosshair.png';
 
 // Sanity check
@@ -46,6 +53,7 @@ for (var country_name in countries) {
     }
 }
 
+var selected = null;
 var selectedCountries = [];
 
 var hRatio = 1;
@@ -90,13 +98,13 @@ function isInside(pos, rect){
 }
 
 function distance(pos, target) {
-    var dx = pos.x - target.x;
-    var dy = pos.y - target.y;
+    let dx = pos.x - target.x;
+    let dy = pos.y - target.y;
     return Math.sqrt(dx * dx + dy * dy);
 }
 
 canvas.addEventListener('click', function(evt) {
-    var mousePos = getMousePos(canvas, evt);
+    let mousePos = getMousePos(canvas, evt);
 
     for (var country_name in countries) {
         if (countries.hasOwnProperty(country_name)) {
