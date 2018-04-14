@@ -10,15 +10,17 @@ using WsServer = SimpleWeb::SocketServer<SimpleWeb::WS>;
 using WsClient = SimpleWeb::SocketClient<SimpleWeb::WS>;
 
 int main() {
-  std::this_thread::sleep_for(std::std);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
 
   // WebSocket (WS)-server at port 8080 using 1 thread
   WsServer server;
   server.config.port = 8081;
 
-  std::ifstream t("Data.js");
   std::stringstream buffer;
-  buffer << t.rdbuf();
+  {
+    std::ifstream t("Data.js");
+    buffer << t.rdbuf();
+  }
 
   std::string Data = buffer.str();
   auto PrefixLen = strlen("countries =");
@@ -26,7 +28,26 @@ int main() {
   Game TheGame(Data.substr(PrefixLen));
 
   auto &echo_all = server.endpoint["^/echo_all/?$"];
-  echo_all.on_message = [&server](shared_ptr<WsServer::Connection> /*connection*/, shared_ptr<WsServer::Message> message) {
+  echo_all.on_message = [&server, &TheGame](shared_ptr<WsServer::Connection> /*connection*/, shared_ptr<WsServer::Message> message) {
+    std::string Msg = message->string();
+
+    istringstream iss(Msg);
+
+    std::vector<std::string> Parts;
+    do
+    {
+      string P;
+      iss >> P;
+      Parts.push_back(P);
+    } while (iss);
+
+    if (Parts.front() == "ATTACK")
+      TheGame.attackCountry(Parts.at(1), Parts.at(2));
+    else if (Parts.front() == "PING") {
+
+    }
+
+
     auto send_stream = make_shared<WsServer::SendStream>();
     *send_stream << message->string();
 
@@ -36,6 +57,7 @@ int main() {
     }
   };
 
+  std::cout << "Starting server" << std::endl;
   thread server_thread([&server]() {
     server.start();
   });
