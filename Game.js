@@ -1,12 +1,32 @@
 var ws;
+
+function updateMap(Data) {
+    for (var country_name in Data) {
+        if (Data.hasOwnProperty(country_name)) {
+            if (country_name === "type")
+                continue;
+            var country = Data[country_name];
+            var local_country = countries[country_name];
+            local_country.owner = country.owner;
+        }
+    }
+}
+
 window.onload=function(){
     ws=new WebSocket("ws://localhost:8081/echo_all");
     ws.onmessage=function(evt) {
+        console.log(evt.data);
         var answer = JSON.parse(evt.data);
+        if (answer["type"] === "update") {
+           updateMap(answer);
+        }
         console.log(answer);
     };
     ws.onopen=function(evt){
-        ws.send("PING");
+        var request = {
+            "type" : "ping"
+        };
+        ws.send(JSON.stringify(request));
     }
 };
 window.onclose=function(){
@@ -16,7 +36,7 @@ window.onclose=function(){
 
 let url_string = window.location.href;
 let url = new URL(url_string);
-let player = url.searchParams.get("player");
+let player = parseInt(url.searchParams.get("player"));
 console.log(player);
 
 
@@ -29,8 +49,13 @@ canvas.height = window.innerHeight;
 let background = new Image();
 background.src = 'Risk_board.svg';
 
-let button = new Image();
-button.src = 'button.png';
+var playerFlags = []
+
+for(var ip = 0; ip < 4; ip++) {
+    var p = new Image();
+    p.src = "player-" + ip + ".png";
+    playerFlags.push(p);
+}
 
 let crosshair = new Image();
 crosshair.src = 'crosshair.png';
@@ -39,6 +64,7 @@ crosshair.src = 'crosshair.png';
 for (var country_name in countries) {
     if (countries.hasOwnProperty(country_name)) {
         var country = countries[country_name];
+        country.name = country_name;
         country["owner"] = -1;
         for (var i = 0; i < country.neighbors.length; i++) {
             var neighbor = country.neighbors[i];
@@ -122,20 +148,51 @@ canvas.addEventListener('click', function(evt) {
                 y : country.y * totalHeight + baseOffset_y
             };
             if (distance(mousePos, country_pos) < 40) {
-                selectedCountries = [];
-                for (var i = 0; i < country.neighbors.length; ++i) {
-                    var neighbor = country.neighbors[i];
-                    if (isEnemyCountry(neighbor))
-                      selectedCountries.push(neighbor);
+                if (isEnemyCountry(country_name)) {
+                    if (selectedCountries.includes(country_name)) {
+                        var request = {
+                            "type" : "attack",
+                            "source" : selected.name,
+                            "target" : country_name
+                        };
+                        ws.send(JSON.stringify(request));
+                    }
+                } else {
+                    selected = country;
+                    selectedCountries = [];
+                    for (var i = 0; i < country.neighbors.length; ++i) {
+                        var neighbor = country.neighbors[i];
+                        if (isEnemyCountry(neighbor))
+                            selectedCountries.push(neighbor);
+                    }
+                    // Outdated, select all countries:
+                    // selectedCountries = country.neighbors;
                 }
-                // Outdated, select all countries:
-                // selectedCountries = country.neighbors;
                 break;
             }
         }
     }
     step();
 }, false);
+
+function requestUpdate() {
+    var request = {
+        "type" : "ping"
+    };
+    if (ws) {
+        ws.send(JSON.stringify(request));
+        console.log("Sending update");
+    } else
+        console.log("Waiting on websocket");
+    setTimeout(requestUpdate, 500);
+}
+requestUpdate();
+
+function getPlayerFlag(playerId) {
+    if (playerId === -1)
+        return playerFlags[0];
+    return playerFlags[playerId];
+}
 
 function step() {
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -152,7 +209,8 @@ function step() {
     for (var country_name in countries) {
         if (countries.hasOwnProperty(country_name)) {
             var country = countries[country_name];
-            drawImageScaled(button, context, country.x, country.y, 0.1);
+            var scale = 0.15;
+            drawImageScaled(getPlayerFlag(country.owner), context, country.x, country.y, scale);
             if (selectedCountries.includes(country_name))
                 drawImageScaled(crosshair, context, country.x, country.y, 0.1);
         }

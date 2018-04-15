@@ -24,7 +24,7 @@ class Country {
   std::string Name;
   std::vector<Country *> Neighbors;
   Player *Owner = nullptr;
-  int Units = 1;
+  int Units = 5;
 
   std::random_device rd;
   std::mt19937 gen;
@@ -55,54 +55,10 @@ public:
   }
 
   bool isNeighbor(Country *C) {
-    return std::find(Neighbors.begin(), Neighbors.end(), C) == Neighbors.end();
+    return std::find(Neighbors.begin(), Neighbors.end(), C) != Neighbors.end();
   }
 
-  nlohmann::json attackOther(Country *Target) {
-    if (!isNeighbor(Target) || Target->Owner == Owner || Units <= 1) {
-      return nlohmann::json();
-    }
-
-    std::vector<int> AttackRolls;
-    for (int i = 0; i < Units - 1; ++i) {
-      AttackRolls.push_back(dis(gen));
-      if (AttackRolls.size() >= 3)
-        break;
-    }
-    std::sort(AttackRolls.rbegin(), AttackRolls.rend());
-
-    std::vector<int> DefenceRolls;
-    for (int i = 0; i < Target->Units; ++i) {
-      DefenceRolls.push_back(dis(gen));
-      if (DefenceRolls.size() >= 2)
-        break;
-    }
-    std::sort(DefenceRolls.rbegin(), DefenceRolls.rend());
-
-    if (AttackRolls.front() <= DefenceRolls.front()) {
-      Units--;
-    } else {
-      Target->Units--;
-    }
-    if (DefenceRolls.size() >= 2 && AttackRolls.size() >= 2) {
-      if (AttackRolls.at(1) <= DefenceRolls.at(1)) {
-        Units--;
-      } else {
-        Target->Units--;
-      }
-    }
-
-    if (Target->Units <= 0) {
-      Target->Units = 1;
-      Target->Owner = Owner;
-      --Units;
-    }
-
-    nlohmann::json j;
-    j["attackRolls"] = AttackRolls;
-    j["defenceRolls"] = DefenceRolls;
-    return j;
-  }
+  nlohmann::json attackOther(Country *Target);
 };
 
 class Game {

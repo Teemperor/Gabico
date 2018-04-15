@@ -44,3 +44,58 @@ Game::Game(std::string Data) {
     i->setOwner(Players.at(PlayerIndex));
   }
 }
+
+nlohmann::json Country::attackOther(Country *Target) {
+
+  nlohmann::json j;
+  if (!isNeighbor(Target)) {
+    j["error"] = Target->getName() + " is not a neighbor country of " + getName();
+    return j;
+  }
+  if (Target->Owner == Owner) {
+    j["error"] = Target->getName() + " is a friendly country of " + getName();
+    return j;
+  }
+  if (Units <= 1) {
+    j["error"] = Target->getName() +  " can't be attacked with 1 unit from " + getName();
+    return j;
+  }
+
+  std::vector<int> AttackRolls;
+  for (int i = 0; i < Units - 1; ++i) {
+    AttackRolls.push_back(dis(gen));
+    if (AttackRolls.size() >= 3)
+      break;
+  }
+  std::sort(AttackRolls.rbegin(), AttackRolls.rend());
+
+  std::vector<int> DefenceRolls;
+  for (int i = 0; i < Target->Units; ++i) {
+    DefenceRolls.push_back(dis(gen));
+    if (DefenceRolls.size() >= 2)
+      break;
+  }
+  std::sort(DefenceRolls.rbegin(), DefenceRolls.rend());
+
+  if (AttackRolls.front() <= DefenceRolls.front()) {
+    Units--;
+  } else {
+    Target->Units--;
+  }
+  if (DefenceRolls.size() >= 2 && AttackRolls.size() >= 2) {
+    if (AttackRolls.at(1) <= DefenceRolls.at(1)) {
+      Units--;
+    } else {
+      Target->Units--;
+    }
+  }
+
+  if (Target->Units <= 0) {
+    Target->Units = 1;
+    Target->Owner = Owner;
+    --Units;
+  }
+  j["attackRolls"] = AttackRolls;
+  j["defenceRolls"] = DefenceRolls;
+  return j;
+}

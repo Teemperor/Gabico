@@ -31,22 +31,18 @@ int main() {
   echo_all.on_message = [&server, &TheGame](shared_ptr<WsServer::Connection> connection, shared_ptr<WsServer::Message> message) {
     std::string Msg = message->string();
 
-    istringstream iss(Msg);
-
-    std::vector<std::string> Parts;
+    auto j = nlohmann::json::parse(Msg);
     auto send_stream = make_shared<WsServer::SendStream>();
 
-    do
-    {
-      string P;
-      iss >> P;
-      Parts.push_back(P);
-    } while (iss);
-
-    if (Parts.front() == "ATTACK")
-      *send_stream << TheGame.attackCountry(Parts.at(1), Parts.at(2)).dump();
-    else if (Parts.front() == "PING") {
-      *send_stream << TheGame.createStatus().dump();
+    std::cout << "Got: " << j["type"] << std::endl;
+    if (j["type"] == "attack") {
+      auto answer = TheGame.attackCountry(j["source"], j["target"]);
+      answer["type"] = "attackresult";
+      *send_stream << answer.dump();
+    } else if (j["type"] == "ping") {
+      auto answer = TheGame.createStatus();
+      answer["type"] = "update";
+      *send_stream << answer.dump();
     }
     connection->send(send_stream);
     // echo_all.get_connections() can also be used to solely receive connections on this endpoint
